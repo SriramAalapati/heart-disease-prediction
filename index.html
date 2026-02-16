@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MediHeart AI | Advanced Cardiac Risk Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #0f4c81; /* Medical Royal Blue */
+        --primary-dark: #0a355c;
+        --accent: #4cc9f0;  /* Tech Blue */
+        --success: #10b981; /* Green */
+        --warning: #f59e0b; /* Orange */
+        --danger: #ef4444;  /* Red */
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg);
+        background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+        background-size: 20px 20px;
+        color: var(--text-main);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+    }
+
+    /* --- Header --- */
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+        max-width: 600px;
+    }
+
+    .logo {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .logo svg {
+        fill: var(--danger);
+        height: 40px;
+        width: 40px;
+        animation: simplePulse 2s infinite ease-in-out;
+    }
+
+    header p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+
+    /* --- Container --- */
+    .container {
+        background: var(--card-bg);
+        width: 100%;
+        max-width: 1000px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    /* --- Form Styling --- */
+    .form-section {
+        padding: 40px;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--bg);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .grid-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+
+    .helper-text {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-style: italic;
+    }
+
+    input, select {
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 1rem;
+        background: #fdfdfd;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.1);
+        background: #fff;
+    }
+
+    /* --- Button --- */
+    .btn-container {
+        padding: 30px 40px;
+        background: #f1f5f9;
+        text-align: center;
+        border-top: 1px solid var(--border);
+    }
+
+    button {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 16px 48px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(15, 76, 129, 0.3);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px rgba(15, 76, 129, 0.4);
+    }
+
+    button:disabled {
+        opacity: 0.7;
+        cursor: wait;
+        transform: none;
+    }
+
+    /* --- Loading Overlay & Animation --- */
+    .overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: none; /* Hidden by default */
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .heart-loader {
+        width: 80px;
+        height: 80px;
+        fill: var(--danger);
+        animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    .loading-text {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary);
+        animation: fadeText 1.5s infinite;
+    }
+
+    /* --- Result Modal --- */
+    .result-modal {
+        display: none;
+        margin-top: 20px;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        border: 2px solid transparent;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    .risk-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+
+    .result-value {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .result-desc {
+        color: var(--text-muted);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    /* State Classes */
+    .high-risk { border-color: var(--danger); background: #fef2f2; }
+    .high-risk .result-value { color: var(--danger); }
+    .high-risk .risk-badge { background: var(--danger); color: white; }
+
+    .medium-risk { border-color: var(--warning); background: #fffbeb; }
+    .medium-risk .result-value { color: var(--warning); }
+    .medium-risk .risk-badge { background: var(--warning); color: white; }
+
+    .low-risk { border-color: var(--success); background: #f0fdf4; }
+    .low-risk .result-value { color: var(--success); }
+    .low-risk .risk-badge { background: var(--success); color: white; }
+
+    .error-box {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #991b1b;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        display: none;
+        text-align: center;
+    }
+
+    /* --- Keyframes --- */
+    @keyframes simplePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    @keyframes heartBeat {
+        0% { transform: scale(0.95); }
+        5% { transform: scale(1.1); }
+        39% { transform: scale(0.85); }
+        45% { transform: scale(1); }
+        60% { transform: scale(0.95); }
+        100% { transform: scale(0.9); }
+    }
+
+    @keyframes fadeText {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media(max-width: 600px) {
+        .form-section { padding: 20px; }
+        .logo { font-size: 1.8rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        MediHeart AI
+    </div>
+    <p>Professional Cardiac Risk Assessment System based on Advanced Machine Learning Models.</p>
+</header>
+
+<div class="container">
+    <form id="riskForm" onsubmit="handlePredict(event)">
+        
+        <div class="form-section">
+            <div class="section-title">
+                <span>👤</span> Patient Demographics & Lifestyle
+            </div>
+            <div class="grid-layout">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age_years" placeholder="e.g. 45" required min="1" max="120" value="45">
+                    <span class="helper-text">Patient's age in years.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender">
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                    </select>
+                    <span class="helper-text">Biological sex.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Body Mass Index (BMI)</label>
+                    <input type="number" step="0.1" id="bmi" placeholder="e.g. 24.5" required value="24.5">
+                    <span class="helper-text">Healthy range: 18.5 - 24.9.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Smoking Status</label>
+                    <select id="smoke" value="1">
+                        <option value="0">Non-Smoker</option>
+                        <option value="1">Smoker</option>
+                    </select>
+                    <span class="helper-text">Currently smoking tobacco products?</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Alcohol Consumption</label>
+                    <select id="alcohol" value="1">
+                        <option value="0">No / Rare</option>
+                        <option value="1">Frequent / Yes</option>
+                    </select>
+                    <span class="helper-text">Regular alcohol intake?</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Physical Activity</label>
+                    <select id="physical_activity" value="1">
+                        <option value="1">Active</option>
+                        <option value="0">Sedentary / Inactive</option>
+                    </select>
+                    <span class="helper-text">Regular exercise (30min+ / day).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section" style="background: #f8fafc;">
+            <div class="section-title">
+                <span>🩸</span> Vitals & Clinical Metrics
+            </div>
+            <div class="grid-layout">
+                <div class="form-group">
+                    <label>Systolic Blood Pressure (mm Hg)</label>
+                    <input type="number" id="sbp" placeholder="e.g. 120" required value="120"       >
+                    <span class="helper-text">Normal: &lt;120. Elevated: 120-129.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Diastolic Blood Pressure (mm Hg)</label>
+                    <input type="number" id="dbp" placeholder="e.g. 80" required value="90">
+                    <span class="helper-text">Normal: &lt;80.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Cholesterol (mg/dL)</label>
+                    <input type="number" step="0.1" id="cholesterol" placeholder="e.g. 190" required value="200">
+                    <span class="helper-text">Desirable: &lt;200 mg/dL.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Serum Glucose (mg/dL)</label>
+                    <input type="number" step="0.1" id="glucose" placeholder="e.g. 95" required value="100">
+                    <span class="helper-text">Normal fasting: 70-100 mg/dL.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Fasting Blood Sugar > 120?</label>
+                    <select id="fasting_blood_sugar" value="true">
+                        <option value="false">No (Normal)</option>
+                        <option value="true">Yes (High)</option>
+                    </select>
+                    <span class="helper-text">Is fasting sugar higher than 120 mg/dL?</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">
+                <span>🫀</span> Cardiac Specifics
+            </div>
+            <div class="grid-layout">
+                <div class="form-group">
+                    <label>Chest Pain Type</label>
+                    <select id="cp" value="typical angina">
+                        <option value="typical angina">Typical Angina (Stress related)</option>
+                        <option value="atypical angina">Atypical Angina</option>
+                        <option value="non-anginal pain">Non-anginal Pain</option>
+                        <option value="asymptomatic">Asymptomatic (No Pain)</option>
+                    </select>
+                    <span class="helper-text">Type of chest sensation reported.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Resting ECG Results</label>
+                    <select id="rest_ecg" value="normal">
+                        <option value="normal">Normal</option>
+                        <option value="st-t abnormality">ST-T Wave Abnormality</option>
+                        <option value="left ventricular hypertrophy">Left Ventricular Hypertrophy</option>
+                    </select>
+                    <span class="helper-text">Result of electrocardiogram while at rest.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Max Heart Rate Achieved</label>
+                    <input type="number" step="0.1" id="thalach" placeholder="e.g. 150" required value="150">
+                    <span class="helper-text">Highest HR during stress test.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Exercise Induced Angina</label>
+                    <select id="exercise_angina" value="false">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                    <span class="helper-text">Chest pain caused by exertion?</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Oldpeak (ST Depression)</label>
+                    <input type="number" step="0.1" id="oldpeak" placeholder="e.g. 1.0" value="20">
+                    <span class="helper-text">ST depression induced by exercise relative to rest.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>ST Slope</label>
+                    <select id="st_slope">
+                        <option value="upsloping">Upsloping (Better)</option>
+                        <option value="flat">Flat</option>
+                        <option value="downsloping">Downsloping (Worse)</option>
+                    </select>
+                    <span class="helper-text">Slope of the peak exercise ST segment.</span>
+                </div>
+                
+                 <div class="form-group">
+                    <label>Major Vessels (Fluoroscopy)</label>
+                    <input type="number" id="num_major_vessels" min="0" max="4" placeholder="0-4" value="2">
+                    <span class="helper-text">Number of major vessels (0-3) colored by flourosopy.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Thalassemia</label>
+                    <select id="thalassemia">
+                        <option value="normal">Normal</option>
+                        <option value="fixed defect">Fixed Defect</option>
+                        <option value="reversible defect">Reversible Defect</option>
+                    </select>
+                    <span class="helper-text">Blood disorder status.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" id="submitBtn">
+                Generate Risk Assessment
+            </button>
+        </div>
+    </form>
+
+    <div style="padding: 0 40px 40px 40px;">
+        <div id="errorBox" class="error-box"></div>
+        
+        <div id="resultModal" class="result-modal">
+            <div id="resultBadge" class="risk-badge">CALCULATING</div>
+            <div id="resultValue" class="result-value">0%</div>
+            <p id="resultDesc" class="result-desc">The AI has analyzed the clinical markers.</p>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="loadingOverlay">
+    <svg class="heart-loader" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+    <div class="loading-text">Analyzing Vitals...</div>
+</div>
+
+<script>
+    // IMPORTANT: REPLACE THIS URL WITH YOUR CURRENT NGROK URL
+    // Ngrok URLs change every time you restart the server unless you have a paid plan.
+    const API_URL = "https://8305-34-124-215-83.ngrok-free.app/predict";
+
+    async function handlePredict(event) {
+        event.preventDefault(); // Stop page reload
+
+        // UI Elements
+        const overlay = document.getElementById('loadingOverlay');
+        const resultModal = document.getElementById('resultModal');
+        const errorBox = document.getElementById('errorBox');
+        
+        // Hide previous results/errors
+        resultModal.style.display = 'none';
+        errorBox.style.display = 'none';
+        
+        // Show Loading Animation
+        overlay.style.display = 'flex';
+
+        // Gather Data
+        // Note: We convert string inputs to Numbers/Booleans where required by the model
+        const payload = {
+            age_years: Number(document.getElementById('age_years').value),
+            gender: Number(document.getElementById('gender').value),
+            smoke: Number(document.getElementById('smoke').value),
+            alcohol: Number(document.getElementById('alcohol').value),
+            physical_activity: Number(document.getElementById('physical_activity').value),
+            bmi: Number(document.getElementById('bmi').value),
+            cholesterol: Number(document.getElementById('cholesterol').value),
+            dbp: Number(document.getElementById('dbp').value),
+            glucose: Number(document.getElementById('glucose').value),
+            sbp: Number(document.getElementById('sbp').value),
+            cp: document.getElementById('cp').value,
+            fasting_blood_sugar: document.getElementById('fasting_blood_sugar').value === "true",
+            rest_ecg: document.getElementById('rest_ecg').value,
+            thalach: Number(document.getElementById('thalach').value),
+            exercise_angina: document.getElementById('exercise_angina').value === "true",
+            oldpeak: Number(document.getElementById('oldpeak').value),
+            st_slope: document.getElementById('st_slope').value,
+            num_major_vessels: Number(document.getElementById('num_major_vessels').value),
+            thalassemia: document.getElementById('thalassemia').value
+        };
+
+        try {
+            // Artificial delay to let the nice animation show (optional, remove in production)
+            await new Promise(r => setTimeout(r, 1500));
+
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true" // Helps with ngrok free tier interstitial page
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || "Server responded with an error");
+            }
+
+            const result = await response.json();
+            
+            // Render Results
+            displayResult(result);
+
+        } catch (error) {
+            console.error("Error:", error);
+            errorBox.style.display = 'block';
+            errorBox.innerHTML = `<strong>Connection Error:</strong> ${error.message}. <br>Please check your internet or ensure the backend server is running.`;
+        } finally {
+            // Hide Loading
+            overlay.style.display = 'none';
+        }
+    }
+
+    function displayResult(data) {
+        const resultModal = document.getElementById('resultModal');
+        const badge = document.getElementById('resultBadge');
+        const value = document.getElementById('resultValue');
+        const desc = document.getElementById('resultDesc');
+
+        // Extract data based on your curl response structure
+        // Expected: {"probability": 0.67, "risk_category": "MEDIUM"}
+        const probability = (data.probability * 100).toFixed(1); 
+        const category = data.risk_category ? data.risk_category.toUpperCase() : "UNKNOWN";
+
+        // Reset classes
+        resultModal.className = 'result-modal';
+        
+        // Logic for styling
+        if (category.includes("HIGH")) {
+            resultModal.classList.add('high-risk');
+            desc.textContent = "The model indicates a significant likelihood of heart disease. Immediate medical consultation is recommended.";
+        } else if (category.includes("MEDIUM")) {
+            resultModal.classList.add('medium-risk');
+            desc.textContent = "The model indicates moderate risk factors. Lifestyle adjustments and monitoring are advised.";
+        } else {
+            resultModal.classList.add('low-risk');
+            desc.textContent = "The model indicates a low probability of heart disease based on the provided metrics.";
+        }
+
+        badge.textContent = `${category} RISK DETECTED`;
+        value.textContent = `${probability}%`;
+        
+        resultModal.style.display = 'block';
+        
+        // Scroll to result on mobile
+        resultModal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+</script>
+
+</body>
+</html>
