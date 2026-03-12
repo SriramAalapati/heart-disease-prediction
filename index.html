@@ -337,6 +337,24 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" step="0.1" id="height" placeholder="e.g. 170" min="50" max="250">
+                    <span class="helper-text">Height in centimeters.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" step="0.1" id="weight" placeholder="e.g. 70" min="20" max="300">
+                    <span class="helper-text">Weight in kilograms.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" id="calculateBMI" style="padding: 8px 16px; font-size: 0.9rem;">Calculate BMI</button>
+                    <span class="helper-text">Click to calculate BMI from height and weight.</span>
+                </div>
+
+                <div class="form-group">
                     <label>Smoking Status</label>
                     <select id="smoke" value="1">
                         <option value="0">Non-Smoker</option>
@@ -550,6 +568,8 @@
             thalassemia: document.getElementById('thalassemia').value
         };
 
+        console.log('Payload being sent:', payload);
+
         try {
             // Artificial delay to let the nice animation show (optional, remove in production)
             await new Promise(r => setTimeout(r, 1500));
@@ -569,6 +589,8 @@
             }
 
             const result = await response.json();
+            
+            console.log('Response received:', result);
             
             // Render Results
             displayResult(result);
@@ -617,6 +639,22 @@
         // Scroll to result on mobile
         resultModal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+
+    // BMI Calculator
+    document.getElementById('calculateBMI').addEventListener('click', function() {
+        const height = parseFloat(document.getElementById('height').value);
+        const weight = parseFloat(document.getElementById('weight').value);
+        const bmiInput = document.getElementById('bmi');
+
+        if (isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
+            alert('Please enter valid height and weight.');
+            return;
+        }
+
+        const heightInMeters = height / 100;
+        const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
+        bmiInput.value = bmi;
+    });
 </script>
 
 </body>
